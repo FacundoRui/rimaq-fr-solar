@@ -146,7 +146,12 @@ function calculate(){
 }
 function summary(){
  let goals=[...document.querySelectorAll('input[name=goal]:checked')].map(x=>x.value).join(', ')||'No indicado';
- let dev=DEVICE_DATA.map((d,i)=>{let q=+document.getElementById('q'+i).value||0;let w=+document.getElementById('w'+i).value||0;let h=+document.getElementById('h'+i).value||0;return q?`${d[0]}: ${q} x ${w}W x ${h}h`:''}).filter(Boolean).join('\\n')||'No indicado';
+ let dev=DEVICE_DATA.map((d,i)=>{
+   const a=ACTIVE[i];
+   return a ? `${d[0]}: ${a.q} x ${a.w}W x ${a.h}h` : '';
+ }).filter(Boolean);
+ CUSTOM.forEach(a=>dev.push(`${a.n}: ${a.q} x ${a.w}W x ${a.h}h`));
+ dev=dev.join('\\n')||'No indicado';
  return `☀️ RIMAQ + FR SOLAR — NUEVA EVALUACIÓN SOLAR
 
 Cliente: ${document.getElementById('name').value}
@@ -175,7 +180,18 @@ Potencia simultánea: ${document.getElementById('peak').textContent}
 
 Comentarios: ${document.getElementById('comments').value||'Sin comentarios'}`;
 }
-function sendWhatsApp(){const msg=encodeURIComponent(summary());const target='5492281525246';window.open('https://wa.me/'+target+'?text='+msg,'_blank')}
+function sendWhatsApp(){
+  try{
+    const msg=encodeURIComponent(summary());
+    const target='5492281525246';
+    const url='https://wa.me/'+target+'?text='+msg;
+    const opened=window.open(url,'_blank');
+    if(!opened){ window.location.href=url; }
+  }catch(error){
+    console.error('Error al preparar WhatsApp:',error);
+    alert('No se pudo preparar el mensaje. Revisá la consola del navegador para más detalles.');
+  }
+}
 function sendEmail(){const subject=encodeURIComponent('Nueva evaluación solar - Rimaq + FR Solar');const body=encodeURIComponent(summary());window.location.href='mailto:?subject='+subject+'&body='+body}
 show();
 </script>
