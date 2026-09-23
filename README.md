@@ -1,0 +1,1 @@
+# rimaq-fr-solar
